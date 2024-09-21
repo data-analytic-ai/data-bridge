@@ -2,15 +2,12 @@ package com.fordevs.databridge.controller;
 
 import com.fordevs.databridge.dto.DatabaseConnectionRequest;
 import com.fordevs.databridge.service.QueryBridgeDatabaseClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
-@RequestMapping("/data/bridge")
 @Slf4j
+@RestController
+@RequestMapping("data/bridge/database")
 public class DatabaseConnectionController {
 
     private final QueryBridgeDatabaseClient queryBridgeDatabaseClient;
@@ -19,9 +16,12 @@ public class DatabaseConnectionController {
         this.queryBridgeDatabaseClient = queryBridgeDatabaseClient;
     }
 
-    @PostMapping("/database/connect")
+    @PostMapping("/connect")  // Path for database connection
     public String connectToDatabase(@RequestBody DatabaseConnectionRequest request) {
+        log.info("Received request to connect to database: {}", request.getDatabaseName());
         queryBridgeDatabaseClient.connectToDatabase(request);
         return "Connection Successful!";
     }
+
+
 }

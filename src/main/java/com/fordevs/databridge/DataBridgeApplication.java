@@ -4,11 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
-@ComponentScan({
-		"com.fordevs.databridge.config",
-		"com.fordevs.databridge.processor"
-})
+@SpringBootApplication(scanBasePackages = "com.fordevs.databridge")
 public class DataBridgeApplication {
 
     public static void main(String[] args) {
