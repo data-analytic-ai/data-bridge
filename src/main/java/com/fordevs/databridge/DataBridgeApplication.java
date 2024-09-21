@@ -9,10 +9,10 @@ import org.springframework.context.annotation.ComponentScan;
 		"com.fordevs.databridge.config",
 		"com.fordevs.databridge.processor"
 })
-public class SpringBatchApplication {
+public class DataBridgeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringBatchApplication.class, args);
+        SpringApplication.run(DataBridgeApplication.class, args);
     }
 
 }
