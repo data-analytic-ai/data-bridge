@@ -24,7 +24,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class DatabaseConfiguration extends DefaultBatchConfiguration {
@@ -78,20 +81,30 @@ public class DatabaseConfiguration extends DefaultBatchConfiguration {
             @Qualifier("sourceDataSource") DataSource sourceDataSource,
             @Qualifier("destinationDataSource") DataSource destinationDataSource) {
         return new StepBuilder("firstChunkStep", jobRepository)
-                .<PostgreSqlStudent, MySqlStudent>chunk(200, transactionManager)
+                .<Map<String, Object>, Map<String, Object>>chunk(200, transactionManager)
                 .reader(jdbcCursorItemReader(sourceDataSource))
                 .writer(jdbcBatchItemWriter(destinationDataSource))
                 .build();
     }
 
+
     @Bean
-    public JdbcCursorItemReader<PostgreSqlStudent> jdbcCursorItemReader(DataSource sourceDataSource) {
-        JdbcCursorItemReader<PostgreSqlStudent> reader = new JdbcCursorItemReader<>();
+    public JdbcCursorItemReader<Map<String, Object>> jdbcCursorItemReader(DataSource sourceDataSource) {
+        JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(sourceDataSource);
-        reader.setSql("SELECT * FROM student"); // Ensure this query matches your table structure
-        reader.setRowMapper(new BeanPropertyRowMapper<>(PostgreSqlStudent.class));
+        reader.setSql("SELECT * FROM student"); // You can modify the SQL query as needed
+        reader.setRowMapper((rs, rowNum) -> {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            Map<String, Object> row = new HashMap<>();
+            for (int i = 1; i <= columnCount; i++) {
+                row.put(metaData.getColumnName(i), rs.getObject(i));
+            }
+            return row;
+        });
         return reader;
     }
+
 
     @Bean
     public JdbcBatchItemWriter<MySqlStudent> jdbcBatchItemWriter(DataSource destinationDataSource) {
