@@ -9,7 +9,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
+import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +23,8 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 @Configuration
 public class DatabaseConfiguration extends DefaultBatchConfiguration {
@@ -82,19 +84,29 @@ public class DatabaseConfiguration extends DefaultBatchConfiguration {
                 .build();
     }
 
+    @Bean
     public JdbcCursorItemReader<PostgreSqlStudent> jdbcCursorItemReader(DataSource sourceDataSource) {
         JdbcCursorItemReader<PostgreSqlStudent> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(sourceDataSource);
-        reader.setSql("SELECT id, name, email FROM student");
+        reader.setSql("SELECT * FROM student"); // Ensure this query matches your table structure
         reader.setRowMapper(new BeanPropertyRowMapper<>(PostgreSqlStudent.class));
         return reader;
     }
 
+    @Bean
     public JdbcBatchItemWriter<MySqlStudent> jdbcBatchItemWriter(DataSource destinationDataSource) {
         JdbcBatchItemWriter<MySqlStudent> writer = new JdbcBatchItemWriter<>();
-        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
-        writer.setSql("INSERT INTO student (id, name, email) VALUES (:id, :name, :email)");
+        writer.setItemPreparedStatementSetter((student, ps) -> {
+            ps.setLong(1, student.getId());
+            ps.setString(2, student.getFirstName());
+            ps.setString(3, student.getLastName());
+            ps.setString(4, student.getEmail());
+            ps.setLong(5, student.getDeptId());
+            ps.setBoolean(6, student.getIsActive());
+        });
+        writer.setSql("INSERT INTO student (id, first_name, last_name, email, dept_id, is_active) VALUES (?, ?, ?, ?, ?, ?)");
         writer.setDataSource(destinationDataSource);
         return writer;
     }
+
 }

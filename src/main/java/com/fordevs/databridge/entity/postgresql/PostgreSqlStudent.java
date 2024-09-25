@@ -28,6 +28,6 @@ public class PostgreSqlStudent {
 	private Long deptId;
 
 	@Column(name = "is_active")
-	private String isActive;
+	private Boolean isActive;
 
 }
