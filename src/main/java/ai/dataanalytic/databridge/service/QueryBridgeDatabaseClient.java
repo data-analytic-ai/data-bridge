@@ -1,6 +1,6 @@
-package com.fordevs.databridge.service;
+package ai.dataanalytic.databridge.service;
 
-import com.fordevs.databridge.dto.DatabaseConnectionRequest;
+import ai.dataanalytic.databridge.dto.DatabaseConnectionRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

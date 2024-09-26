@@ -1,4 +1,4 @@
-package com.fordevs.databridge.config;
+package ai.dataanalytic.databridge.config;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -57,15 +57,22 @@ public class DatabaseConfiguration extends DefaultBatchConfiguration {
     }
 
     @Bean
-    @Qualifier("chunkJob")
-    public Job chunkJob(JobRepository jobRepository, @Qualifier("firstChunkStep") Step firstChunkStep) {
-        return new JobBuilder("chunkJob", jobRepository).incrementer(new RunIdIncrementer()).start(firstChunkStep).build();
+    @Qualifier("dataTransferJob")
+    public Job dataTransferJob(JobRepository jobRepository, @Qualifier("dataTransferStep") Step dataTransferStep) {
+        return new JobBuilder("dataTransferJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(dataTransferStep)
+                .build();
     }
 
     @Bean
-    @Qualifier("firstChunkStep")
-    public Step firstChunkStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("sourceDataSource") DataSource sourceDataSource, @Qualifier("destinationDataSource") DataSource destinationDataSource) {
-        return new StepBuilder("firstChunkStep", jobRepository).<Map<String, Object>, Map<String, Object>>chunk(200, transactionManager).reader(jdbcCursorItemReader(sourceDataSource)).writer(jdbcBatchItemWriter(destinationDataSource)).build();
+    @Qualifier("dataTransferStep")
+    public Step dataTransferStep(JobRepository jobRepository, PlatformTransactionManager transactionManager, @Qualifier("sourceDataSource") DataSource sourceDataSource, @Qualifier("destinationDataSource") DataSource destinationDataSource) {
+        return new StepBuilder("dataTransferStep", jobRepository)
+                .<Map<String, Object>, Map<String, Object>>chunk(200, transactionManager)
+                .reader(jdbcCursorItemReader(sourceDataSource))
+                .writer(jdbcBatchItemWriter(destinationDataSource))
+                .build();
     }
 
 
@@ -92,7 +99,8 @@ public class DatabaseConfiguration extends DefaultBatchConfiguration {
         writer.setItemSqlParameterSourceProvider(new MapSqlParameterSourceProvider());
 
         // You will need to construct the SQL dynamically to match the destination table schema
-        writer.setSql("INSERT INTO student (id, first_name, last_name, email, dept_id, is_active) " + "VALUES (:id, :first_name, :last_name, :email, :dept_id, :is_active)");
+        writer.setSql("INSERT INTO student (id, first_name, last_name, email, dept_id, is_active) "
+                + "VALUES (:id, :first_name, :last_name, :email, :dept_id, :is_active)");
         writer.setDataSource(destinationDataSource);
         return writer;
     }

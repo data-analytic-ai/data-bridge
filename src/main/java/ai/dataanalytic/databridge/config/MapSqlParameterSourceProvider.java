@@ -1,4 +1,4 @@
-package com.fordevs.databridge.config;
+package ai.dataanalytic.databridge.config;
 
 import org.springframework.batch.item.database.ItemSqlParameterSourceProvider;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

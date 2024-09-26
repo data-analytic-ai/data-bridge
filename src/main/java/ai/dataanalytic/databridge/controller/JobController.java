@@ -1,4 +1,4 @@
-package com.fordevs.databridge.controller;
+package ai.dataanalytic.databridge.controller;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -19,7 +19,7 @@ public class JobController {
     private JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("chunkJob")
+    @Qualifier("dataTransferJob")
     private Job job;  // This is the job you defined in the config
 
     @PostMapping("/batch/run")

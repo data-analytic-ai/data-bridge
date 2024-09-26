@@ -1,4 +1,4 @@
-package com.fordevs.databridge.utils;
+package ai.dataanalytic.databridge.utils;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ public class DataSourceValidator {
 
     @Autowired
     @Qualifier("dataSource")
-    private DataSource jobDataSource;
+    private DataSource dataSource;
 
     @Autowired
     @Qualifier("sourceDataSource")
@@ -26,7 +26,7 @@ public class DataSourceValidator {
 
     @PostConstruct
     public void validateDataSources() {
-        validateDataSource(jobDataSource, "jobDataSource");
+        validateDataSource(dataSource, "dataSource");
         validateDataSource(sourceDataSource, "sourceDataSource");
         validateDataSource(destinationDataSource, "destinationDataSource");
     }
